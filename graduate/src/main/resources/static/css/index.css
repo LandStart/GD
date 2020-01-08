@@ -1,0 +1,16 @@
+body.html{
+    margin:0px;
+    height:100%;
+}
+.content{
+    height:87%;
+    background: #FFFFFF;
+}
+.layui-footer{
+    height: 3%;
+    width: 100%;
+    text-align: center;
+    margin-top: 5%;
+    background-color: #FDC891;
+}
+

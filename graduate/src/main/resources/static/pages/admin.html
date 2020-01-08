@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--设置不缓存页面-->
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/index.css">
+</head>
+<body>
+    <!-- 头部 -->
+    <div id ="head">
+        <ul class="layui-nav" style="text-align: right">
+
+            <li class="layui-nav-item">
+                <a >个人中心</span></a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;">修改信息</a></dd>
+                    <dd><a href="javascript:;">安全管理</a></dd>
+                    <dd><a href="javascript:;" id = "exitAndclearSession">退出</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item" lay-unselect="">
+                <a id="username" href="javascript:;" ><i class="layui-icon layui-icon-username" style="font-size: 25px; color: #1E9FFF;"></i></a>
+            </li>
+        </ul>
+        <div style="margin-top: 15px;"></div>
+    </div>
+    <div class="content">
+        <table id="demo" lay-filter="tableFilter" ></table>
+    </div>
+    <!--底部-->
+    <div class="layui-footer layui-bg-red">
+        Copyright ©2019-©2020 LiuDong
+    </div>
+</body>
+<script src="../lib/layui/layui.js"></script>
+<script>
+    layui.use(['form','layer','jquery','table','element'], function() {
+
+        var layer = layui.layer;
+        var $ = layui.jquery;
+        var table = layui.table;
+        var element = layui.element;
+
+        $("#login").click(function () {
+             location.replace('login');
+        });
+
+        $.ajax({
+            url: '../usernameFromSession',
+            type: 'POST',
+            contentType: 'application/json' ,
+            success: function (res) {
+                console.log(res.msg);
+                if(res.msg != null){
+                    $("#username").attr("title",res.msg);
+                }
+            }
+        });
+
+        $("#exitAndclearSession").click(function () {
+            layer.confirm('是否退出?', {icon: 3, title: '提示'}, function (index) {
+                $.ajax({
+                    url: "../exitAndclearSession",
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function (res) {
+                        if (res.code === 0) {
+                            window.location.replace("../login");
+                        }
+                    }
+                });
+                layer.close(index);
+            });
+        });
+
+        table.render({
+             elem: '#demo'
+            ,height: 500
+            ,url: '../User/GetTrackUser' //数据接口
+            ,page: true //开启分页
+            ,limit: 12
+            ,cols: [[ //表头
+                {field: 'userid', title: 'ID', width:50, hide:true}
+                ,{field: 'username', title: '用户名', width:300}
+                ,{field: 'authorityid', title: '权限级别', width:300, sort: true}
+                ,{field:'au', title:'授权', width:500, templet: '#barDemo', unresize: true}
+                ]]
+        });
+
+
+        table.on('tool(tableFilter)',function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+
+            if(layEvent === 'read'){
+                layer.open({
+                    title: '查看权限',
+                    type: 2,
+                    maxmin: true,
+                    shade: 0.5,
+                    area: ['70%', '70%'],
+                    content: 'authority-read.html',
+                    zIndex: layer.zIndex,
+                    success: function(layero,index){
+                        var iframe = window['layui-layer-iframe'+index];
+                        iframe.child(data.authorityid);
+                    },
+                    end: function () {
+                        $(".layui-laypage-btn")[0].click();
+                    }
+                })
+            }else{
+                layer.open({
+                    title: '修改权限',
+                    type: 2,
+                    maxmin: true,
+                    shade: 0.5,
+                    area: ['70%', '70%'],
+                    content: 'authority-write.html',
+                    zIndex: layer.zIndex,
+                    success: function(layero,index){
+                    },
+                    end: function () {
+                        $(".layui-laypage-btn")[0].click();
+                    }
+                })
+            }
+        });
+    });
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="read">权限查看</a>
+    <a class="layui-btn layui-btn-xs" lay-event="write">添加权限</a>
+</script>
+
+
+
+</html>

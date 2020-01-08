@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--设置不缓存页面-->
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui/css/layui.css">
+</head>
+<body>
+
+<span class="layui-breadcrumb">
+  <a><cite>主题查看页面</cite></a>
+</span>
+<table class="layui-hide" id="theme" lay-filter="tableFilter"></table>
+<script src="../lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    function child(data) {
+        var piv = data;
+        layui.use(['table','jquery','form'], function () {
+            var table = layui.table;
+            var $ = layui.jquery;
+            var form = layui.form;
+
+            table.render({
+                elem: '#theme'
+                , url: '../theme/Read'
+                , method: 'post'
+                , limit: 6
+                , page: true //开启分页
+                ,where: {
+                    pid: piv
+                }
+                , cols: [[
+                    {field: 'id', width: 150, title: '主题ID', sort: true}
+                    , {field: 'name', width: 250, title: '名称'}
+                    , {field: 'description', width: 250, title: '简述'}
+                    , {field: 'themeclassifyId', width: 80, title: '分类ID',hide:true}
+                    , {field: 'themelabelId', width: 80, title: '别名ID',hide:true}
+                    , {field: 'op', title:'操作', width:300, templet: '#barDemo', unresize: true}
+                ]]
+            });
+
+            table.on('tool(tableFilter)',function (obj) {
+                var data = obj.data;
+                var event = obj.event;
+
+                layer.msg(event);
+                if(event === '记录查询'){
+                    layer.open({
+                        title: '历史操作',
+                        type: 2,
+                        maxmin: true,
+                        shade: 0.5,
+                        area: ['90%', '90%'],
+                        content: 'themeHistory.html',
+                        zIndex: layer.zIndex,
+                        success: function(layero,index){
+                            var iframe = window['layui-layer-iframe'+index];
+                            iframe.child(data.id);
+                        },
+                        end: function () {
+                            $(".layui-laypage-btn")[0].click();
+                        }
+                    });
+
+                }else if(event === '追加内容'){
+                    layer.open({
+                        title: '内容',
+                        type: 2,
+                        maxmin: true,
+                        shade: 0.5,
+                        area: ['90%', '90%'],
+                        content: 'themecontent.html',
+                        zIndex: layer.zIndex,
+                        success: function(layero,index){
+                            var iframe = window['layui-layer-iframe'+index];
+                            iframe.child(data.id);
+                        },
+                        end: function () {
+                            $(".layui-laypage-btn")[0].click();
+                        }
+                    });
+                }else if( event === '讨论区'){
+                    layer.open({
+                        title: '讨论',
+                        type: 2,
+                        maxmin: true,
+                        shade: 0.5,
+                        area: ['90%', '90%'],
+                        content: 'forum.html',
+                        zIndex: layer.zIndex,
+                        success: function(layero,index){
+                            var iframe = window['layui-layer-iframe'+index];
+                            iframe.child(data.id);
+
+                            var body = layer.getChildFrame('body', index);
+                            var iframeWin = window[layero.find('iframe')[0]['name']];
+                            body.find('#themeid')[0].value= data.id ;
+                            form.render();
+
+                        },
+                        end: function () {
+                            $(".layui-laypage-btn")[0].click();
+                        }
+                    });
+                } else{
+                    layer.open({
+                        title: '图谱',
+                        type: 2,
+                        maxmin: true,
+                        shade: 0.5,
+                        area: ['90%', '90%'],
+                        content: 'Graph.html',
+                        zIndex: layer.zIndex,
+                        success: function(layero,index){
+                           // var iframe = window['layui-layer-iframe'+index];
+                           // iframe.child(data.id);
+                        },
+                        end: function () {
+                            $(".layui-laypage-btn")[0].click();
+                        }
+                    });
+                }
+            })
+        });
+    }
+</script>
+
+
+<script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="记录查询">历史查询</a>
+        <a class="layui-btn layui-btn-xs" lay-event="追加内容">补充</a>
+        <a class="layui-btn layui-btn-xs" lay-event="讨论区">进入讨论区</a>
+        <a class="layui-btn layui-btn-xs" lay-event="查看图谱">图谱</a>
+</script>
+</body>
+</html>

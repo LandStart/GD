@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--设置不缓存页面-->
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui/css/layui.css">
+    <script src="../lib/echarts/js/echarts.js"></script>
+</head>
+<body>
+<div id="main" style="width: 500px;height: 500px;"></div>
+</body>
+<script src="../lib/layui/layui.js"></script>
+<script type="application/javascript">
+
+
+    // 初始化echarts实例
+    var myChart = echarts.init(document.getElementById("main"));
+
+    option = {
+        title: {
+            text: 'Graph'
+        },
+        tooltip: {},
+        animationDurationUpdate: 1500,
+        animationEasingUpdate: 'quinticInOut',
+        label: {
+            normal: {
+                show: true,
+                    fontSize: 12
+            }
+        },
+        legend: {
+            x: "center",
+            show: false
+        },
+        series: [
+            {
+                type: 'graph', //类型
+                id: 'gg',//id
+                legendHoverLink: true,//点击效果
+                layout: 'force',//布局
+                symbolSize: 45,//图大小
+                focusNodeAdjacency: false,  // 是否在鼠标移到节点上的时候突出显示节点以及节点的边和邻接节点, 默认是true
+                roam: true,//鼠标缩放和平移漫游
+                edgeSymbol: ['none', 'arrow'],//边两端的标记类型，
+                categories: [{ //节点分类的类目，可选。
+                    name: '查询实体', //名称
+                    itemStyle: { //
+                        color: "#FF0000",
+                    }
+                }],
+                label: {
+                    show: true,
+                    fontSize: 12,
+                    fontStyle: 'normal',
+                    fontWeight: 'bolder',
+                    fontFamily: 'sans-serif',
+                },
+                force: {
+                    repulsion: 1000,
+                    edgeLength: [150, 100],
+                    layoutAnimation: false
+                },
+                edgeSymbolSize: [4, 50],//边两端的标记大小
+                edgeLabel: {
+                    show: true,
+                    fontSize: 10,
+                    formatter: "{c}"   // 标签内容格式器。模板变量有 {a}、{b}、{c}，分别表示系列名，数据名，数据值。
+                },
+                data: [{
+                        name: '1',
+                        x: 10,
+                        y: 10,
+                        value: 10,
+                        cateotry: 1,
+                        symbol: 'circle',
+                        symbolSize: 10,
+
+                }],  // 节点
+                links:
+                    [{
+                        source: 'n1',
+                        target: 'n2'
+                }],  // 边或者关系
+                lineStyle: {
+                    normal: {
+                        opacity: 0.5,
+                        width: 1.0,
+                        curveness: 0,
+                        color: "#262626"
+                    }
+                }
+            }
+        ]
+    };
+
+</script>
+</html>
