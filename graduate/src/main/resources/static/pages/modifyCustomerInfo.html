@@ -14,13 +14,73 @@
     <link rel="stylesheet" href="../lib/layui/css/layui.css">
 </head>
 <body>
-<table class="layui-hide" id="WriteAu" lay-filter="demoEvent"></table>
+<!-- 头部 -->
+<div id ="head">
+    <ul class="layui-nav" style="text-align: right">
+
+        <li class="layui-nav-item">
+            <a >个人中心</span></a>
+            <dl class="layui-nav-child">
+                <dd><a href="javascript:;">安全管理</a></dd>
+                <dd><a href="javascript:;" id = "exitAndclearSession">退出</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item" lay-unselect="">
+            <a id="username" href="javascript:;" ><i class="layui-icon layui-icon-username" style="font-size: 25px; color: #1E9FFF;"></i></a>
+        </li>
+    </ul>
+    <div style="margin-top: 15px;"></div>
+</div>
+<div class="content">
+    <table class="layui-hide" id="WriteAu" lay-filter="demoEvent"></table>
+</div>
+<!--底部-->
+<div class="layui-footer layui-bg-red">
+    Copyright ©2019-©2020 LiuDong
+</div>
+
 </body>
 <script src="../lib/layui/layui.js" charset="utf-8"></script>
 <script>
-    layui.use(['table','jquery'],function(){
-        var table = layui.table;
+    layui.use(['table','jquery','element','layer','form'],function(){
+        var layer = layui.layer;
         var $ = layui.jquery;
+        var table = layui.table;
+        var element = layui.element;
+
+        $("#login").click(function () {
+            location.replace('login');
+        });
+
+        $.ajax({
+            url: '../usernameFromSession',
+            type: 'POST',
+            contentType: 'application/json' ,
+            success: function (res) {
+                console.log(res.msg);
+                if(res.msg != null){
+                    $("#username").attr("title",res.msg);
+                }
+            }
+        });
+
+        $("#exitAndclearSession").click(function () {
+            layer.confirm('是否退出?', {icon: 3, title: '提示'}, function (index) {
+                $.ajax({
+                    url: "../exitAndclearSession",
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function (res) {
+                        if (res.code === 0) {
+                            window.location.replace("../login");
+                        }
+                    }
+                });
+                layer.close(index);
+            });
+        });
+
+
 
         table.render({
             elem: '#WriteAu'

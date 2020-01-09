@@ -20,6 +20,11 @@
 <div id ="head">
 
     <ul class="layui-nav" style="text-align: right">
+        <li class="layui-nav-item" lay-unselect="">
+            <a id="username2" href="javascript:;">
+                <i id="announcement" class="layui-icon layui-icon-notice" style="font-size: 25px; color: #1E9FFF;"></i>
+            </a>
+        </li>
         <li class="layui-nav-item">
             <a  id="customer">个人中心</a>
             <dl class="layui-nav-child">
@@ -78,6 +83,25 @@
                     }
                 });
                 layer.close(index);
+            });
+        });
+        
+        $("#announcement").click(function () {
+            layer.open({
+                type: 1
+                ,title: false //不显示标题栏
+                ,closeBtn: false
+                ,area: '300px;'
+                ,shade: 0.8
+                ,btn: ['已读']
+                ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                ,btnAlign: 'c'
+                ,moveType: 1 //拖拽模式，0或者1
+                ,content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49;' +
+                    ' color: #fff; font-weight: 300;">告知告知，</div>'
+                ,success: function(layero){
+
+                }
             });
         });
 

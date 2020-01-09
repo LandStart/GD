@@ -33,7 +33,7 @@ spring:
         elideSetAutoCommits: true
         maintainTimeStats: false
   thymeleaf:
-    mode: HTML5
+    mode: HTML 5
     cache: false
     servlet:
       content-type: text/html

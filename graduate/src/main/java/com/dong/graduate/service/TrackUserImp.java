@@ -23,14 +23,23 @@ public class TrackUserImp extends ServiceImpl<TrackUserMapper, TrackUser> {
 
         QueryWrapper<TrackUser> queryWrapper = new QueryWrapper<>();
         log.info("===========>Start Select userid ,username ,authorityId from the Trackuser table");
-        queryWrapper.select("userId","userName","authorityId");
+        queryWrapper.select("userId","userName");
         baseMapper.selectPage(ipage,queryWrapper);
         return ipage;
     }
 
-    public IPage<TrackUser> GetCusLoginInfo(Integer page, Integer limit){
+    public IPage<TrackUser> GetCusLoginInfo(Integer page, Integer limit,String username){
         Page<TrackUser> ipage = new Page<>(page,limit);
 
+        QueryWrapper<TrackUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(true,"userName",username);
+        log.info("===========>Start Select userid ,username ,authorityId from the Trackuser table");
+        queryWrapper.select("userId","userName","accessToken","phone","remark");
+        baseMapper.selectPage(ipage,queryWrapper);
+        return ipage;
+    }
+    public IPage<TrackUser> GetCusLoginInfo(Integer page, Integer limit){
+        Page<TrackUser> ipage = new Page<>(page,limit);
         QueryWrapper<TrackUser> queryWrapper = new QueryWrapper<>();
         log.info("===========>Start Select userid ,username ,authorityId from the Trackuser table");
         queryWrapper.select("userId","userName","accessToken","phone","remark");

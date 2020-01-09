@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--设置不缓存页面-->
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui/css/layui.css">
+    <link rel="stylesheet" href="../css/index.css">
+</head>
+<body>
+<!-- 头部 -->
+<div id ="head">
+    <ul class="layui-nav" style="text-align: right">
+
+        <li class="layui-nav-item">
+            <a >个人中心</span></a>
+            <dl class="layui-nav-child">
+                <dd><a href="javascript:;">修改信息</a></dd>
+                <dd><a href="javascript:;">权限管理</a></dd>
+                <dd><a href="javascript:;" id = "exitAndclearSession">退出</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item" lay-unselect="">
+            <a id="username" href="javascript:;" ><i class="layui-icon layui-icon-username" style="font-size: 25px; color: #1E9FFF;"></i></a>
+        </li>
+    </ul>
+    <div style="margin-top: 15px;"></div>
+</div>
+<div class="content">
+
+    <table id="demo" lay-filter="tableFilter" ></table>
+</div>
+<!--底部-->
+<div class="layui-footer layui-bg-red">
+    Copyright ©2019-©2020 LiuDong
+</div>
+</body>
+<script src="../lib/layui/layui.js"></script>
+<script>
+    layui.use(['form','layer','jquery','table','element'], function() {
+
+        var layer = layui.layer;
+        var $ = layui.jquery;
+        var table = layui.table;
+        var element = layui.element;
+
+        $("#login").click(function () {
+            location.replace('login');
+        });
+
+        $.ajax({
+            url: '../usernameFromSession',
+            type: 'POST',
+            contentType: 'application/json' ,
+            success: function (res) {
+                console.log(res.msg);
+                if(res.msg != null){
+                    $("#username").attr("title",res.msg);
+                }
+            }
+        });
+
+        $("#exitAndclearSession").click(function () {
+            layer.confirm('是否退出?', {icon: 3, title: '提示'}, function (index) {
+                $.ajax({
+                    url: "../exitAndclearSession",
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function (res) {
+                        if (res.code === 0) {
+                            window.location.replace("../login");
+                        }
+                    }
+                });
+                layer.close(index);
+            });
+        });
+
+        table.render({
+            elem: '#demo'
+            ,height: 500
+            ,url: '../User/GetTrackUser' //数据接口
+            ,page: true //开启分页
+            ,limit: 12
+            ,cols: [[ //表头
+                {field: 'userid', title: 'ID', width:50}
+                ,{field: 'username', title: '用户名', width:300}
+                {title: '操作', width: 200, templet: '#operationTpl', align: 'center'}
+            ]]
+        });
+
+        table.on('tool(tableFilter)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            var  notice_target =  data.aipname;
+            console.log("obj",obj);
+            console.log(notice_target);
+            if (layEvent === 'edit') {
+                layer.open({
+                    title: '编辑用户',
+                    type: 2,
+                    maxmin: true,
+                    shade: 0.5,
+                    area: ['90%', '90%'],
+                    content: 'securityincidents-edit.html',
+                    zIndex: layer.zIndex,
+                    success: function(layero,index){
+                        var myDate = new Date();
+                        var body = layer.getChildFrame('body', index);
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+                        if(notice_target == "undefined" || notice_target == null || notice_target == ""){
+                            notice_target = "Anonymous"
+                        }
+                        body.find('#aipname')[0].value= notice_target ;
+                        body.find(".eid")[0].value=data.id;
+                        body.find(".eid")[0].title=data.id;
+                        body.find(".noticeTime")[0].title = myDate ;
+                        body.find(".noticeTime")[0].value=myDate ;
+                        body.find(".noticeEmail")[0].value=data.noticeemail;
+
+                        form.render();
+                    },
+                    end: function () {
+                        $(".layui-laypage-btn")[0].click();
+                    }
+                });
+            } else if (layEvent === 'del') {
+                layer.confirm("确定要删除吗？",
+                    {skin: 'layui-layer-lan',
+                        icon: 2,
+                        title: '提示',
+                        anim: 6
+                    }, function (index) {
+                        $.ajax({
+                            type: "POST",
+                            url: "../remove",
+                            dataType: "json",
+                            data: {
+                                id: data.id,
+                            },
+                            success: function (res) {
+                                if (res.code === 1) {
+                                    layer.msg("操作成功！", {icon: 1, time: 1000}, function () {
+                                        //table.reload('tableId',{})
+                                        location.reload()
+                                    })
+                                } else {
+                                    layer.msg("删除失败"  )
+                                }
+                            },
+                            error: function () {
+                                alert("出现错误");
+                                return false;
+                            }
+                        });
+
+                    },
+                );
+            }else if(layEvent === 'toresolve'){
+                layer.confirm("解决问题？",
+                    {
+                        icon:3,title:'提示'
+                    },function (index) {
+                        $.ajax({
+                            type:"POST",
+                            url:"../toresolve",
+                            dataType:"json",
+                            data:{
+                                id: data.id,
+                            },
+                            success: function (res) {
+                                if (res.code === 1) {
+                                    layer.msg("操作成功！", {icon: 1, time: 1000}, function () {
+                                        //table.reload('tableId',{})
+                                        location.reload()
+                                    })
+                                } else {
+                                    layer.msg("解决失败"  )
+                                }
+                            },
+                            error: function () {
+                                alert("出现错误");
+                                return false;
+                            }
+                        });
+                    })
+            }else {
+                layer.open({
+                    title: "在线报告查看",
+                    type:2,
+                    shade: false,
+                    maxmin: true,
+                    shade: 0.5,
+                    area: ['90%', '90%'],
+                    content: 'generateReport.html',
+                    zIndex: layer.zIndex,
+
+                    success: function(layero,index){
+                        var body = layer.getChildFrame('body', index);
+
+                        var iframeWin = window[layero.find('iframe')[0]['name']];
+                        if(notice_target == "undefined" || notice_target == null || notice_target == ""){
+                            notice_target = "Anonymous";
+                        }
+                        body.find("#resolveTime")[0].value = data.resolvetime.substring(0,10);
+                        body.find("#dealTime")[0].value = data.noticetime.substring(0,10);
+                        body.find("#aipname")[0].value = data.aipname;
+                        body.find("#noticeemail")[0].value = data.noticeemail;
+                        body.find("#desc")[0].value = data.describeevent;
+                        body.find("#discoverTime")[0].value = data.datetime.substring(0,10);
+                        body.find("#dispeople")[0].value = data.sipname;
+                        body.find("#eventfqcy")[0].value = data.eventfqcy;
+                        body.find("#eventtype")[0].value = data.eventtype;
+                        form.render();
+
+                    },
+                    end: function () {
+                        $(".layui-laypage-btn")[0].click();
+                    }
+
+                });
+
+            }
+
+        });
+
+
+
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="read">跟踪主题</a>
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="read">跟踪会话</a>
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="read">通知</a>
+    <a class="layui-btn layui-btn-xs" lay-event="write">添加权限</a>
+</script>
+
+
+
+</html>

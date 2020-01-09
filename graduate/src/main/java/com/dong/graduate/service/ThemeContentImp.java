@@ -22,6 +22,11 @@ public class ThemeContentImp extends ServiceImpl<ThemeContentMapper, ThemeConten
         return  baseMapper.selectList(queryWrapper);
     }
 
+    public List<ThemeContent> getlistAll(){
+        QueryWrapper<ThemeContent> queryWrapper = new QueryWrapper<>();
+        return  baseMapper.selectList(queryWrapper);
+    }
+
     public IPage<ThemeContent> getlistofpage(Integer limit, Integer page, String themeId){
         log.info("===========>Enter the getlistofpage method , start select id,orgName,abbreviation,ipScope,parentId");
         Page<ThemeContent> ipage = new Page<>(page,limit);

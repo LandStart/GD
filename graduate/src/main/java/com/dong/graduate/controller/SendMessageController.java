@@ -48,13 +48,47 @@ public class SendMessageController {
     public ResultVO<Object> getMessage(){
         log.info("enter the getMessage method .....");
         String themeid = httpServletRequest.getParameter("pid");
-        System.out.println(themeid);
         List<Object> data = sendMessageImp.getMessage(themeid);
 
         ResultVO<Object> resultVO = ResultVO.builder().build();
         resultVO.setCode(0);
         resultVO.setMsg("ok");
         resultVO.setData(data);
+        return resultVO;
+    }
+
+    @RequestMapping("/GetAll")
+    @ResponseBody
+    public ResultVO<Object> getMessageAll(){
+        log.info("enter the getMessageAll method .....");
+
+       List<Object> data = sendMessageImp.getMessage();
+        ResultVO<Object> resultVO = ResultVO.builder().build();
+        resultVO.setCode(0);
+        resultVO.setMsg("ok");
+        resultVO.setData(data);
+        return resultVO;
+    }
+
+    @RequestMapping("/del")
+    @ResponseBody
+    public ResultVO<Object> delMessageById(String sid){
+
+        System.out.println(sid.toString());
+        log.info("enter the delMessageById method .....");
+
+        int ifSuccess = sendMessageImp.deleteMessageById(Integer.valueOf(sid));
+        ResultVO<Object> resultVO = ResultVO.builder().build();
+        if(ifSuccess == 1){
+            resultVO.setCode(0);
+            resultVO.setMsg("ok");
+            resultVO.setData(null);
+        }else{
+            resultVO.setCode(1);
+            resultVO.setMsg("nok");
+            resultVO.setData(null);
+        }
+
         return resultVO;
     }
 }

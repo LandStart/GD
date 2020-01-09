@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Slf4j
 @RequestMapping("/User")
 @Controller
@@ -20,6 +22,8 @@ public class UserController<T> {
     @Autowired
     TrackUserImp trackUserImp;
 
+    @Autowired
+    HttpServletRequest httpServletRequest;
 
     @RequestMapping("GetTrackUser")
     @ResponseBody
@@ -60,11 +64,24 @@ public class UserController<T> {
     @ResponseBody
     public ResultOfUserPage GetCusLoginInfo(Integer limit, Integer page){
         log.info("**********Enter the GetCusLoginInfo method ");
+        String username =(String) httpServletRequest.getSession().getAttribute("username");
+        IPage<TrackUser> pageResult = trackUserImp.GetCusLoginInfo(page,limit,username);
+        ResultOfUserPage resultOfTrackUserPage = new ResultOfUserPage(Integer.valueOf(0),"ok",pageResult.getRecords(),Long.valueOf(pageResult.getTotal()));
+
+        return resultOfTrackUserPage;
+    }
+
+    @RequestMapping("/GetAllCusLoginInfo")
+    @ResponseBody
+    public ResultOfUserPage GetAllCusLoginInfo(Integer limit, Integer page){
+        log.info("**********Enter the GetAllCusLoginInfo method ");
         IPage<TrackUser> pageResult = trackUserImp.GetCusLoginInfo(page,limit);
         ResultOfUserPage resultOfTrackUserPage = new ResultOfUserPage(Integer.valueOf(0),"ok",pageResult.getRecords(),Long.valueOf(pageResult.getTotal()));
 
         return resultOfTrackUserPage;
     }
+
+
 
 
 

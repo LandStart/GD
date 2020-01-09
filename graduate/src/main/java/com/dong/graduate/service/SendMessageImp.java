@@ -1,5 +1,6 @@
 package com.dong.graduate.service;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dong.graduate.mapper.SendMessageMapper;
@@ -29,4 +30,17 @@ public class SendMessageImp extends ServiceImpl<SendMessageMapper, SendMessage> 
         queryWrapper.select("userName","userMessage","sendTime","themeid");
         return baseMapper.selectList(queryWrapper);
     }
+
+    public List<Object> getMessage(){
+        QueryWrapper queryWrapper = new QueryWrapper();
+        //queryWrapper.select("id","userName","userMessage","sendTime","themeId");
+        return baseMapper.selectList(queryWrapper);
+    }
+
+    public int deleteMessageById(Integer id){
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq(true,"id",id);
+        return baseMapper.delete(queryWrapper);
+    }
+
 }

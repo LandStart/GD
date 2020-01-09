@@ -26,4 +26,12 @@ public class SendMessage {
         this.sendtime = sendtime;
         this.themeid = themeid;
     }
+
+    public SendMessage(Integer id, String username, String usermessage, Date sendtime, Integer themeid) {
+        this.id = id;
+        this.username = username;
+        this.usermessage = usermessage;
+        this.sendtime = sendtime;
+        this.themeid = themeid;
+    }
 }

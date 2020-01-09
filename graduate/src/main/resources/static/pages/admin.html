@@ -34,10 +34,50 @@
         <div style="margin-top: 15px;"></div>
     </div>
     <div class="content">
-        <table id="demo" lay-filter="tableFilter" ></table>
+        <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+            <ul class="layui-tab-title">
+                <li class="layui-this">网站设置</li>
+                <li>用户管理</li>
+                <li>权限管理</li>
+                <li>主题管理</li>
+                <li>会话跟踪</li>
+            </ul>
+            <div class="layui-tab-content" style="height: 100px;">
+                <div class="layui-tab-item layui-show">
+                    <form class="layui-form" action="">
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">系统公告</label>
+                            <div class="layui-input-block">
+                                <textarea placeholder="请输入内容" class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="layui-tab-item">
+                    <table id="userManager" lay-filter="userManagerFilter" ></table>
+                </div>
+                <div class="layui-tab-item">
+                    <table id="AuthorityManager" lay-filter="authorityManagerFilter" ></table>
+                </div>
+                <div class="layui-tab-item">
+                    <table id="themeManager" lay-filter="themeManagerFilter" ></table>
+                </div>
+                <div class="layui-tab-item">
+                    <table id="SessionManager" lay-filter="SessionManagerFilter" ></table>
+                </div>
+
+            </div>
+        </div>
     </div>
     <!--底部-->
-    <div class="layui-footer layui-bg-red">
+    <div class="layui-footer layui-bg-red" style="margin-top: 30%;">
         Copyright ©2019-©2020 LiuDong
     </div>
 </body>
@@ -59,7 +99,6 @@
             type: 'POST',
             contentType: 'application/json' ,
             success: function (res) {
-                console.log(res.msg);
                 if(res.msg != null){
                     $("#username").attr("title",res.msg);
                 }
@@ -83,21 +122,69 @@
         });
 
         table.render({
-             elem: '#demo'
+             elem: '#AuthorityManager'
             ,height: 500
             ,url: '../User/GetTrackUser' //数据接口
             ,page: true //开启分页
-            ,limit: 12
+            ,limit: 10
             ,cols: [[ //表头
-                {field: 'userid', title: 'ID', width:50, hide:true}
+                {field: 'userid', title: 'ID', width:50}
                 ,{field: 'username', title: '用户名', width:300}
-                ,{field: 'authorityid', title: '权限级别', width:300, sort: true}
                 ,{field:'au', title:'授权', width:500, templet: '#barDemo', unresize: true}
                 ]]
         });
 
+        table.render({
+            elem: '#themeManager'
+            , height: 500
+            , url: '../theme/ContentAll' //数据接口
+            , page: true //开启分页
+            , limit: 10
+            , cols: [[ //表头
+                {field: 'id', title: '唯一标识ID', width: 100}
+                , {field: 'themeid', title: '主题ID', width: 80}
+                , {field: 'userid', title: '用户ID', width: 80}
+                , {field: 'content', title: '内容', width: 500}
+                , {field: 'deepth', title: '深度', width: 80}
+                , {field: 'parentid', title: '父ID', width: 80}
+                , {field: 'op', title: '操作', width: 300, templet: '#11', unresize: true}
+            ]]
+        });
 
-        table.on('tool(tableFilter)',function (obj) {
+        table.render({
+            elem: '#userManager'
+            ,url:'../User/GetAllCusLoginInfo'
+            ,method: 'post'
+            ,limit: 10
+            ,page: true //开启分页
+            ,cols: [[
+                {field:'userid', width:80, title: 'ID', sort: true},
+                {field:'username', width:250, title: '用户名', sort: true}
+                ,{field:'accesstoken', width:250, title: '密码',event: 'updateau' ,style:'cursor: pointer;'}
+                ,{field:'phone', width:250, title: '电话',event: 'updateau' ,style:'cursor: pointer;'}
+                ,{field:'remark', width:250, title: '备注',event: 'updateau' ,style:'cursor: pointer;'}
+            ]]
+        });
+
+        table.render({
+            elem: '#SessionManager'
+            ,height: 500
+            ,url: '../Message/GetAll' //数据接口
+            ,page: true //开启分页
+            ,limit: 10
+            ,cols: [[ //表头
+                {field: 'id', title: '唯一标识ID', hide:true}
+                ,{field: 'themeid', title: '主题ID', width:80}
+                ,{field: 'username', title: '用户名', width:250}
+                ,{field: 'usermessage', title: '信息', width:300}
+                ,{field: 'sendtime', title: '发送时间', width:300}
+                ,{field:'op', title:'操作', width:200, templet: '#SessionManagerbarDemo', unresize: true}
+            ]],
+            id: 'SessionManagerid'
+        });
+
+
+        table.on('tool(authorityManagerFilter)',function (obj) {
             var data = obj.data;
             var layEvent = obj.event;
 
@@ -112,7 +199,7 @@
                     zIndex: layer.zIndex,
                     success: function(layero,index){
                         var iframe = window['layui-layer-iframe'+index];
-                        iframe.child(data.authorityid);
+                        iframe.child(data.userid);
                     },
                     end: function () {
                         $(".layui-laypage-btn")[0].click();
@@ -135,6 +222,91 @@
                 })
             }
         });
+
+        table.on('tool(themeManagerFilter)',function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+
+            if(layEvent === 'read'){
+                layer.open({
+                    title: '查看权限',
+                    type: 2,
+                    maxmin: true,
+                    shade: 0.5,
+                    area: ['70%', '70%'],
+                    content: 'authority-read.html',
+                    zIndex: layer.zIndex,
+                    success: function(layero,index){
+                        var iframe = window['layui-layer-iframe'+index];
+                        iframe.child(data.userid);
+                    },
+                    end: function () {
+                        $(".layui-laypage-btn")[0].click();
+                    }
+                })
+            }else{
+                layer.open({
+                    title: '修改权限',
+                    type: 2,
+                    maxmin: true,
+                    shade: 0.5,
+                    area: ['70%', '70%'],
+                    content: 'authority-write.html',
+                    zIndex: layer.zIndex,
+                    success: function(layero,index){
+                    },
+                    end: function () {
+                        $(".layui-laypage-btn")[0].click();
+                    }
+                })
+            }
+        });
+
+        table.on('tool(SessionManagerFilter)',function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            console.log(data.id);
+            if(layEvent === 'del'){
+                $.ajax({
+                    url: '/gd/Message/del',
+                    type: 'POST',
+                    data: {
+                        sid: data.id
+                    },
+                    dataType: 'json',
+                    success: function(res){
+                        if(res.code === 0){
+                            table.reload('SessionManagerid');
+                        }
+                    }
+
+                })
+
+            }else{
+                layer.open({
+                    title: '通知',
+                    type: 2,
+                    maxmin: true,
+                    shade: 0.5,
+                    area: ['70%', '70%'],
+                    content: 'SessionManagerNotice.html',
+                    zIndex: layer.zIndex,
+                    success: function(layero,index){
+                    },
+                    end: function () {
+                        $(".layui-laypage-btn")[0].click();
+                    }
+                })
+            }
+        });
+
+
+        element.on('tab(docDemoTabBrief)', function(data){
+            console.log(data.index);
+            if(data.index === 1){
+
+            }
+        });
     });
 </script>
 
@@ -143,6 +315,9 @@
     <a class="layui-btn layui-btn-xs" lay-event="write">添加权限</a>
 </script>
 
-
+<script type="text/html" id="SessionManagerbarDemo">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-xs" lay-event="notice">通知</a>
+</script>
 
 </html>

@@ -67,9 +67,19 @@ public class ThemeController {
         List datas = themeContentImp.getlist(Integer.valueOf(themeid));
         ResultVO<Object> resultVO = ResultVO.builder().build();
 
-        //通过Themeid 查userid
 
-        //通过themeid  查themename
+        resultVO.setCode(0);
+        resultVO.setMsg("ok");
+        resultVO.setData(datas);
+        return resultVO;
+    }
+
+    @RequestMapping("/ContentAll")
+    @ResponseBody
+    public ResultVO<Object> getThemeContentAll(){
+        List datas = themeContentImp.getlistAll();
+        ResultVO<Object> resultVO = ResultVO.builder().build();
+
 
         resultVO.setCode(0);
         resultVO.setMsg("ok");
